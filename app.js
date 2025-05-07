@@ -10,7 +10,7 @@ const {
 	getEditUser,
 	deleteUser,
 	resetPassword,
-  } = require("./controller/userController");
+} = require("./controller/userController");
 
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -67,6 +67,24 @@ app.get('/logout', (req, res) => {
 			res.render('layout', { content: 'index.ejs' })
 		}
 		res.render('login.ejs')
+	});
+});
+
+app.get('/subscribers', (req, res) => {
+	var mysql2 = require('mysql2')
+	var con = mysql2.createConnection({
+		host: "localhost",
+		user: "root",
+		password: "",
+		database: "newsfeed_management"
+	})
+	const sql = "SELECT * FROM subscribers WHERE status = 1";
+	con.query(sql, function (err, result) {
+		if (err) {
+			console.error(err);
+			return res.status(500).send("Lỗi truy vấn CSDL");
+		}
+		res.render('layout', { content: 'subscribers.ejs', subscribers: result });
 	});
 });
 
@@ -187,6 +205,8 @@ app.post('/categories/delete/:id', (req, res) => {
 });
 
 app.get('/contacts', (req, res) => {
+	var url = req.url;
+
 	var mysql2 = require('mysql2')
 	var con = mysql2.createConnection({
 		host: "localhost",
@@ -194,15 +214,62 @@ app.get('/contacts', (req, res) => {
 		password: "",
 		database: "newsfeed_management"
 	})
-	const sql = "SELECT * FROM contacts"
+	const sql = "SELECT * FROM contacts WHERE status = 0"
 	con.query(sql, function (err, result) {
 		if (err) {
 			console.error(err);
 			return res.status(500).send("Lỗi truy vấn CSDL");
 		}
-		res.render('layout', { content: 'contact.ejs', contacts: result });
+		res.render('layout', { content: 'contact.ejs', contacts: result, url: url });
 	});
 });
+
+app.get('/contacts/approved', (req, res) => {
+	var url = req.url;
+
+	console.log(url);
+
+	var mysql2 = require('mysql2');
+	var conn = mysql2.createConnection({
+		host: "localhost",
+		user: "root",
+		password: "",
+		database: "newsfeed_management"
+	})
+
+	const query = "SELECT * FROM contacts WHERE status = 1";
+
+	conn.query(query, (err, result) => {
+		if (err) {
+			console.log('Lỗi truy vấn: ', err);
+			return res.status(500);
+		}
+		return res.render('layout', { content: 'contact.ejs', contacts: result, url: url });
+	});
+});
+
+app.get('/contact/approve/:id', (req, res) => {
+	var mysql2 = require('mysql2')
+	var con = mysql2.createConnection({
+		host: "localhost",
+		user: "root",
+		password: "",
+		database: "newsfeed_management"
+	});
+
+	const id = req.params.id;
+
+	const query = `UPDATE contacts SET status = 1 WHERE contact_id = ${id}`;
+
+	con.query(query, (err, result) => {
+		if (err) {
+			console.log('Lỗi truy vấn: ', err);
+			return res.status(500);
+		}
+		res.redirect('/contacts');
+	});
+});
+
 
 app.get('/posts', (req, res) => {
 	var mysql2 = require('mysql2')
@@ -260,7 +327,7 @@ app.get('/posts/edit/:id', (req, res) => {
 	GROUP BY post_id
 	`
 	const category_sql = "SELECT * FROM categories WHERE status = 1"
-	
+
 	con.query(sql, [req.params.id], function (err, result) {
 		if (err) {
 			console.error(err);
@@ -272,7 +339,7 @@ app.get('/posts/edit/:id', (req, res) => {
 				console.error(err);
 				return res.status(500).send("Lỗi truy vấn CSDL");
 			}
-			res.render('layout', { content: 'posts/edit_post.ejs', posts:  result[0], categories: categories });
+			res.render('layout', { content: 'posts/edit_post.ejs', posts: result[0], categories: categories });
 		});
 	});
 });
@@ -342,7 +409,7 @@ app.post('/posts/add', (req, res) => {
 
 app.get("/users", getAllUsers);
 app.get("/users/add", (req, res) => {
-  res.render("layout", { content: "users/add.ejs", data: {} });
+	res.render("layout", { content: "users/add.ejs", data: {} });
 });
 app.get("/users/edit/:id", getEditUser);
 
