@@ -13,8 +13,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Tiêu đề</label>
-            <input type="text" name="title" class="form-control" placeholder="Nhập tiêu đề"
-                value="<%= posts.title %>">
+            <input type="text" name="title" class="form-control" placeholder="Nhập tiêu đề" value="<%= posts.title %>">
         </div>
         <div class="mb-3">
             <label class="form-label">Tóm tắt</label>
@@ -23,7 +22,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Nội dung</label>
-            <textarea name="editor1" id="editor1" rows="10" cols="80" class="form-control"
+            <textarea id="content" name="post_content" class="form-control" rows="10" cols="10"
                 placeholder="Nhập nội dung"><%= posts.post_content %></textarea>
         </div>
         <div class="mb-3">
@@ -34,10 +33,12 @@
         <div class="mb-3">
             <label class="form-label">Danh mục</label>
             <select name="category_id" class="form-select" aria-label="Default select example">
-                <% categories.forEach((item) => { %>
-                <option value="<%= item.category_id %>" <% if (posts.category_id==item.category_id) { %> selected <% } %>>
-                    <%= item.category_name %></option>
-                <% }) %>
+                <% categories.forEach((item)=> { %>
+                    <option value="<%= item.category_id %>" <% if (posts.category_id==item.category_id) { %> selected <%
+                            } %>>
+                            <%= item.category_name %>
+                    </option>
+                    <% }) %>
             </select>
         </div>
         <div class="mb-3">
@@ -48,10 +49,8 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Lưu</button>
-        <script>
-    // Replace the <textarea id="editor1"> with a CKEditor 4
-    // instance, using default configuration.
-    CKEDITOR.replace( 'editor1' );
-</script>
     </form>
 </div>
+<script>
+    CKEDITOR.replace('content');
+</script>
