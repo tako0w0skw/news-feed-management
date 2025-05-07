@@ -1,0 +1,75 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Quản lý bài viết</h2>
+      <div>
+        <a href="/posts/add/" class="btn btn-primary">Thêm</a>
+      </div>
+    </div>
+  
+    <table class="table table-bordered table-hover text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>STT</th>
+          <th>Tiêu đề</th>
+          <th>Tóm tắt</th>
+          <th>Nội dung</th>
+          <th>Hình ảnh</th>
+          <th>Người viết</th>
+          <th>Danh mục</th>
+          <th>Trạng thái</th>
+          <th>Lượt xem</th>
+          <th>Xoá</th>
+          <th>Sửa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (posts && posts.length> 0) { %>
+          <% posts.forEach((item, index)=> { %>
+            <tr>
+              <td>
+                <%= index + 1 %>
+              </td>
+              <td>
+                <%= item.title %>
+              </td>
+              <td>
+                <%= item.subtitle %>
+              </td>
+              <td class="line-clamp">
+                <%= item.post_content %>
+              </td>
+              <td>
+                <img src="image/<%= item.image_url %>" width="50px" height="50px">
+              </td>
+              <td>
+                <%= item.full_name %>
+              </td>
+              <td>
+                <%= item.category_name %>
+              </td>
+              <td>
+                <%= item.status %>
+              </td>
+              <td>
+                <%= item.views %>
+              </td>
+              <td>
+                <form action="/posts/delete/<%= item.post_id %>" method="POST"
+                  onsubmit="return confirm('Bạn có chắc muốn xoá?')">
+                  <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                </form>
+              </td>
+              <td>
+                <a href="/posts/edit/<%= item.post_id %>" class="btn btn-warning text-white"><i
+                    class="fas fa-edit"></i></a>
+              </td>
+            </tr>
+            <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5">Không có dữ liệu</td>
+                </tr>
+                <% } %>
+      </tbody>
+    </table>
+  </div>

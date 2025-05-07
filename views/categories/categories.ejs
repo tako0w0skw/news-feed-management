@@ -1,0 +1,47 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Quản lý danh mục</h2>
+    <div>
+      <a href="/categories/add/" class="btn btn-primary">Thêm</a>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-hover text-center">
+    <thead class="table-dark">
+      <tr>
+        <th>STT</th>
+        <th>Danh mục</th>
+        <th>Xoá</th>
+        <th>Sửa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (categories && categories.length> 0) { %>
+        <% categories.forEach((item, index)=> { %>
+          <tr>
+            <td>
+              <%= index + 1 %>
+            </td>
+            <td>
+              <%= item.category_name %>
+            </td>
+            <td>
+              <form action="/categories/delete/<%= item.category_id %>" method="POST"
+                onsubmit="return confirm('Bạn có chắc muốn xoá?')">
+                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+              </form>
+            </td>
+            <td>
+              <a href="/categories/edit/<%= item.category_id %>" class="btn btn-warning text-white"><i
+                  class="fas fa-edit"></i></a>
+            </td>
+          </tr>
+          <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5">Không có dữ liệu</td>
+              </tr>
+              <% } %>
+    </tbody>
+  </table>
+</div>
