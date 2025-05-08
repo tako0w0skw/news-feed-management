@@ -3,6 +3,16 @@
 <!-- Core theme JS-->
 <script src="/js/scripts.js"></script>
 
+<!-- script cho phần chọn option danh mục bài viết -->
+<script>
+    function redirectToCategory(select) {
+        const selectedValue = select.value;
+        if (selectedValue) {
+            window.location.href = selectedValue; // Chuyển hướng đến URL của option
+        }
+    }
+</script>
+
 </body>
 
 </html>

@@ -2,6 +2,23 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Quản lý bài viết</h2>
     <div>
+      <form action="/posts/search" style="margin: 8px;" class="d-flex contact_form" role="search">
+        <input name="keyword" class="form-control me-2" type="search"
+          placeholder="Nhập tìm kiếm.." aria-label="Search">
+        <input class="btn btn-primary" type="submit" value="Tìm kiếm">
+      </form>
+    </div>
+    <div>
+      <select class="catgArchive" onchange="redirectToCategory(this)">
+        <option>Chọn danh mục</option>
+        <% categories.forEach((item)=> { %>
+          <option value="http://127.0.0.1:3000/posts/search/category/<%= item.category_id %>" <%= posts.selectedCategory == item.category_id ? 'selected' : '' %>>
+            <%= item.category_name %>
+          </option>
+          <% }) %>
+      </select>
+    </div>
+    <div>
       <a href="/posts/add/" class="btn btn-primary">Thêm</a>
     </div>
   </div>
@@ -14,6 +31,7 @@
         <th>Tóm tắt</th>
         <th>Nội dung</th>
         <th>Hình ảnh</th>
+        <th>Ngày tạo</th>
         <th>Tác giả</th>
         <th>Danh mục</th>
         <th>Trạng thái</th>
@@ -39,10 +57,13 @@
               <%= item.post_content %>
             </td>
             <td>
-              <img src="image/<%= item.image_url %>" width="50px" height="50px">
+              <img src="/image/<%= item.image_url %>" width="50px" height="50px">
             </td>
             <td>
               <%= item.full_name %>
+            </td>
+            <td>
+              <%= item.created_at %>
             </td>
             <td>
               <%= item.category_name %>

@@ -11,6 +11,7 @@ const {
 	deleteUser,
 	resetPassword,
 } = require("./controller/userController");
+const { default: getDateVietNam } = require("./helper/getDateVietNam");
 
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -279,8 +280,11 @@ app.get('/posts', (req, res) => {
 		password: "",
 		database: "newsfeed_management"
 	})
+
+	const category = `SELECT * FROM categories`;
+
 	const sql = `
-	SELECT posts.*, users.full_name, categories.category_name
+	SELECT DISTINCT posts.*, users.full_name, categories.category_name, categories.category_id
 	FROM posts JOIN users ON posts.author_id = users.user_id JOIN categories ON posts.category_id = categories.category_id
 	WHERE posts.STATUS = 1
 	GROUP BY post_id
@@ -290,7 +294,97 @@ app.get('/posts', (req, res) => {
 			console.error(err);
 			return res.status(500).send("Lỗi truy vấn CSDL");
 		}
-		res.render('layout', { content: 'posts/posts.ejs', posts: result });
+
+		result.forEach(post => {
+			post.created_at = getDateVietNam(post.created_at);
+		});
+
+		con.query(category, function (err, categories) {
+			if (err) {
+				console.error(err);
+				return res.status(500).send("Lỗi truy vấn CSDL");
+			}
+			res.render('layout', { content: 'posts/posts.ejs', posts: result, categories: categories });
+		});
+	});
+});
+
+app.get('/posts/search', (req, res) => {
+	var mysql2 = require('mysql2')
+	var conn = mysql2.createConnection({
+		host: "localhost",
+		user: "root",
+		password: "",
+		database: "newsfeed_management"
+	})
+
+	const searchKey = req.query.keyword;
+	console.log('searchKey:', searchKey);
+
+	const category = `SELECT * FROM categories`;
+	const query = `
+		SELECT posts.*, users.full_name, categories.category_name, categories.category_id
+		FROM posts join categories on posts.category_id = categories.category_id join users on posts.author_id = users.user_id
+		WHERE posts.status = 1 AND (title LIKE ? OR subtitle LIKE ?)
+	`;
+	const searchKeyLike = `%${searchKey}%`;
+
+	console.log('searchKeyLike:', searchKeyLike);
+
+	conn.query(query, [searchKeyLike, searchKeyLike], (err, result) => {
+		if (err) {
+			console.error('Lỗi truy vấn dữ liệu:', err);
+			return next();
+		}
+
+		conn.query(category, function (err, categories) {
+			if (err) {
+				console.error(err);
+				return res.status(500).send("Lỗi truy vấn CSDL");
+			}
+			res.render('layout', { content: 'posts/posts.ejs', posts: result, categories: categories });
+		});
+	});
+});
+
+app.post('/posts/search', (req, res) => {
+	const keyword = req.body.keyword;
+	res.redirect(`/posts/search?keyword=${keyword}`);
+});
+
+app.get('/posts/search/category/:category_id', (req, res) => {
+	const { category_id } = req.params;
+
+	var mysql2 = require('mysql2')
+	var conn = mysql2.createConnection({
+		host: "localhost",
+		user: "root",
+		password: "",
+		database: "newsfeed_management"
+	})
+
+	const category = `SELECT * FROM categories`;
+
+	const query = `
+		SELECT posts.*, users.full_name, categories.category_name, categories.category_id
+		FROM posts join categories on posts.category_id = categories.category_id join users on posts.author_id = users.user_id
+		WHERE posts.status = 1 AND posts.category_id = ?
+		`;
+
+	conn.query(category, (err, categories) => {
+		if (err) {
+			console.error('Lỗi truy vấn dữ liệu:', err);
+			return next();
+		}
+
+		conn.query(query, [category_id], (err, result) => {
+			if (err) {
+				console.error('Lỗi truy vấn dữ liệu:', err);
+				return next();
+			}
+
+			res.render('layout', { content: 'posts/posts.ejs', posts: result, categories: categories });
+		});
 	});
 });
 
