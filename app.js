@@ -11,6 +11,7 @@ const {
 	deleteUser,
 	resetPassword,
 } = require("./controller/userController");
+
 const { default: getDateVietNam } = require("./helper/getDateVietNam");
 
 app.set('view engine', 'ejs')
@@ -337,6 +338,10 @@ app.get('/posts/search', (req, res) => {
 			return next();
 		}
 
+		result.forEach(post => {
+			post.created_at = getDateVietNam(post.created_at);
+		});
+
 		conn.query(category, function (err, categories) {
 			if (err) {
 				console.error(err);
@@ -382,6 +387,10 @@ app.get('/posts/search/category/:category_id', (req, res) => {
 				console.error('Lỗi truy vấn dữ liệu:', err);
 				return next();
 			}
+
+			result.forEach(post => {
+				post.created_at = getDateVietNam(post.created_at);
+			});
 
 			res.render('layout', { content: 'posts/posts.ejs', posts: result, categories: categories });
 		});
